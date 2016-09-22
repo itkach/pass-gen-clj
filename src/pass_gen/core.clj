@@ -18,6 +18,18 @@
     :parse-fn #(Integer/parseInt %)
     :validate [#(pos? %) "Must be a positive number"]]
 
+   ["-n" "--number-of-words COUNT"
+    "Generate password that consists of this many words"
+    :default 4
+    :parse-fn #(Integer/parseInt %)
+    :validate [#(pos? %) "Must be a positive number"]]
+
+   ["-N" "--number-of-passwords COUNT"
+    "Generate this many passwords"
+    :default 5
+    :parse-fn #(Integer/parseInt %)
+    :validate [#(pos? %) "Must be a positive number"]]
+
    [nil "--min-password-length LENGTH"
     "Generate password at least this long."
     :default 12
@@ -67,17 +79,21 @@
                       (<= min-word-length word-len max-word-length))]
            word))))
 
-(defn run
-  [options]
+(defn run [options]
   (let [words (load-words options)
-        min-password-length (:min-password-length options)]
+        {:keys [min-password-length
+                number-of-words
+                number-of-passwords]} options]
+
     (printf "Found %d words\n" (count words))
+
     (let [passwords
           (for [_ (range)
-                :let [password (generate words 4)]
+                :let [password (generate words number-of-words)]
                 :when (>= (count password) min-password-length)]
             password)]
-      (println (first passwords)))))
+      (doseq [password (take number-of-passwords passwords)]
+        (println password)))))
 
 
 (defn -main
