@@ -18,6 +18,12 @@
     :parse-fn #(Integer/parseInt %)
     :validate [#(pos? %) "Must be a positive number"]]
 
+   [nil "--min-password-length LENGTH"
+    "Generate password at least this long."
+    :default 12
+    :parse-fn #(Integer/parseInt %)
+    :validate [#(pos? %) "Must be a positive number"]]
+
    ["-f" "--word-file"
     "Path to word file (one word per line)."
     :default "/usr/share/dict/words"]
@@ -51,19 +57,27 @@
   (string/join " "
                (repeatedly word-count (partial rand-nth words))))
 
-
-(defn run
+(defn load-words
   [{:keys [min-word-length max-word-length word-file word-filter]}]
   (with-open [rdr (clojure.java.io/reader word-file)]
-    (let [words
-          (vec (for [word (line-seq rdr)
-                     :let [word-len (count word)]
-                     :when (and
-                            (re-matches word-filter word)
-                            (<= min-word-length word-len max-word-length))]
-                 word))]
-      (printf "Found %d words\n" (count words))
-      (println (generate words 4)))))
+    (vec (for [word (line-seq rdr)
+               :let [word-len (count word)]
+               :when (and
+                      (re-matches word-filter word)
+                      (<= min-word-length word-len max-word-length))]
+           word))))
+
+(defn run
+  [options]
+  (let [words (load-words options)
+        min-password-length (:min-password-length options)]
+    (printf "Found %d words\n" (count words))
+    (let [passwords
+          (for [_ (range)
+                :let [password (generate words 4)]
+                :when (>= (count password) min-password-length)]
+            password)]
+      (println (first passwords)))))
 
 
 (defn -main
