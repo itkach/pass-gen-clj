@@ -4,37 +4,41 @@
   (:gen-class))
 
 
+(defn parse-int [s] (Integer/parseInt s))
+
+(def validate-pos? [#(pos? %) "Must be a positive number"])
+
 (def cli-options
   [
    ["-m" "--min-word-length LENGTH"
     "Use words at least this long."
     :default 2
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(pos? %) "Must be a positive number"]]
+    :parse-fn parse-int
+    :validate validate-pos?]
 
    ["-M" "--max-word-length LENGTH"
     "Use words at most this long."
     :default 6
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(pos? %) "Must be a positive number"]]
+    :parse-fn parse-int
+    :validate validate-pos?]
 
    ["-n" "--number-of-words COUNT"
     "Generate password that consists of this many words"
     :default 4
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(pos? %) "Must be a positive number"]]
+    :parse-fn parse-int
+    :validate validate-pos?]
 
    ["-N" "--number-of-passwords COUNT"
     "Generate this many passwords"
     :default 5
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(pos? %) "Must be a positive number"]]
+    :parse-fn parse-int
+    :validate validate-pos?]
 
    [nil "--min-password-length LENGTH"
     "Generate password at least this long."
     :default 12
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(pos? %) "Must be a positive number"]]
+    :parse-fn parse-int
+    :validate validate-pos?]
 
    ["-f" "--word-file"
     "Path to word file (one word per line)."
